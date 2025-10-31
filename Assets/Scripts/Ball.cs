@@ -1,8 +1,11 @@
 using UnityEngine;
 
+public enum Side { None, Left, Right }
+
 [RequireComponent(typeof(Rigidbody2D))]
 public class Ball : MonoBehaviour
 {
+    public Side LastHitter { get; private set; } = Side.None;
     public float startSpeed = 10f;
     public float speedIncreasePerHit = 0.5f;
     public float maxSpeed = 20f;
@@ -39,7 +42,12 @@ public class Ball : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (col.collider.CompareTag("Paddle"))
+        // --- Identify hitter ---
+        if (col.collider.CompareTag("PlayerPaddle"))    LastHitter = Side.Left;
+        else if (col.collider.CompareTag("AIPaddle"))   LastHitter = Side.Right;
+
+        // --- Paddle bounce physics ---
+        if (col.collider.CompareTag("PlayerPaddle") || col.collider.CompareTag("AIPaddle"))
         {
             float y = HitFactor(transform.position, col.transform.position, col.collider.bounds.size.y);
 
