@@ -1021,8 +1021,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   startSpeed: 8
   speedIncreasePerHit: 2
-  maxSpeed: 20
-  randomBounceY: 0.5
+  maxSpeed: 22
+  randomBounceY: 1
 --- !u!1 &1146761165
 GameObject:
   m_ObjectHideFlags: 0
@@ -1177,7 +1177,7 @@ MonoBehaviour:
   ball: {fileID: 1138465225}
   moveSpeed: 11
   clampY: 4.2
-  responsiveness: 0.1
+  responsiveness: 0.166
   trackOnlyWhenApproaching: 1
 --- !u!50 &1146761170
 Rigidbody2D:
