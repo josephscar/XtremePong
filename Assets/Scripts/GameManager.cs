@@ -29,6 +29,9 @@ public class GameManager : MonoBehaviour
 
     public void OnScore(int leftDelta, int rightDelta, GameObject _)
     {
+
+        SFX.I?.PlayScore();
+
         leftScore += leftDelta;
         rightScore += rightDelta;
         UpdateUI();
@@ -46,6 +49,7 @@ public class GameManager : MonoBehaviour
     }
 
     void ServeInternal() => ball.ResetBall(serveToRight: pendingServeToRight);
+
 
     void UpdateUI()
     {

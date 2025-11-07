@@ -5,8 +5,8 @@ using UnityEngine.InputSystem;
 public class PaddlePlayerInput : MonoBehaviour
 {
     [Header("Input")]
-    [Tooltip("Drag the Move action from your Input Actions asset (Value/Vector2).")]
-    public InputActionReference moveAction; // assign in Inspector
+    public InputActionReference moveAction;   // assign in Inspector
+    public InputActionReference pauseAction;  // assign in Inspector (Esc/Start)
 
     [Header("Movement")]
     public float moveSpeed = 12f;
@@ -14,11 +14,12 @@ public class PaddlePlayerInput : MonoBehaviour
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
+    private bool isPaused;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Kinematic; // we control motion
+        rb.bodyType = RigidbodyType2D.Kinematic;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         rb.freezeRotation = true;
     }
@@ -31,9 +32,11 @@ public class PaddlePlayerInput : MonoBehaviour
             moveAction.action.performed += OnMove;
             moveAction.action.canceled += OnMove;
         }
-        else
+
+        if (pauseAction != null && pauseAction.action != null)
         {
-            Debug.LogError("PaddlePlayerInput: Move ActionReference not assigned.");
+            pauseAction.action.Enable();
+            pauseAction.action.performed += OnPause;
         }
     }
 
@@ -45,18 +48,49 @@ public class PaddlePlayerInput : MonoBehaviour
             moveAction.action.canceled -= OnMove;
             moveAction.action.Disable();
         }
+
+        if (pauseAction != null && pauseAction.action != null)
+        {
+            pauseAction.action.performed -= OnPause;
+            pauseAction.action.Disable();
+        }
     }
 
     private void OnMove(InputAction.CallbackContext ctx)
     {
-        moveInput = ctx.ReadValue<Vector2>(); // we only use Y
+        if (isPaused) return; // ignore input while paused
+        moveInput = ctx.ReadValue<Vector2>();
+    }
+
+    private void OnPause(InputAction.CallbackContext ctx)
+    {
+        if (!ctx.performed) return;
+        TogglePause();
+    }
+
+    private void TogglePause()
+    {
+        isPaused = !isPaused;
+
+        if (isPaused)
+        {
+            Time.timeScale = 0f; // freeze physics & movement
+            moveInput = Vector2.zero;
+            Debug.Log("Game Paused");
+        }
+        else
+        {
+            Time.timeScale = 1f; // resume
+            Debug.Log("Game Resumed");
+        }
     }
 
     void FixedUpdate()
     {
-        // Drive kinematic Rigidbody2D via MovePosition using desired velocity.
+        if (isPaused) return;
+
         var desired = new Vector2(0f, moveInput.y * moveSpeed);
-        rb.linearVelocity = desired; // Unity 6 API
+        rb.linearVelocity = desired;
 
         var next = rb.position + desired * Time.fixedDeltaTime;
         next.y = Mathf.Clamp(next.y, -clampY, clampY);

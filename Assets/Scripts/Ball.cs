@@ -38,6 +38,8 @@ public class Ball : MonoBehaviour
         float vy = Random.Range(-0.6f, 0.6f);
         Vector2 dir = new Vector2(serveToRight ? 1f : -1f, vy).normalized;
         rb.linearVelocity = dir * startSpeed;
+
+        SFX.I?.PlayServe();
     }
 
     void OnCollisionEnter2D(Collision2D col)
@@ -57,6 +59,12 @@ public class Ball : MonoBehaviour
 
             v = v.normalized * Mathf.Min(rb.linearVelocity.magnitude + speedIncreasePerHit, maxSpeed);
             rb.linearVelocity = v;
+
+            // --- Audio ---
+            float speed = rb.linearVelocity.magnitude;
+            float intensity01 = Mathf.InverseLerp(2f, 14f, speed);
+            SFX.I?.PlayHit(intensity01);
+
         }
     }
 
