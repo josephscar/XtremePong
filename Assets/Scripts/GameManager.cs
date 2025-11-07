@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public Transform aiPaddle;
     public Text leftScoreText;
     public Text rightScoreText;
+    public GameOverMenu gameOverMenu;
 
     [Header("Rules")]
     public int pointsToWin = 11;
@@ -36,16 +37,35 @@ public class GameManager : MonoBehaviour
         rightScore += rightDelta;
         UpdateUI();
 
+        bool leftWon = leftScore >= pointsToWin;
+        bool rightWon = rightScore >= pointsToWin;
+
+        if (leftWon || rightWon)
+        {
+            // Game Over flow
+            string winner = leftWon ? "Left Wins!" : "Right Wins!";
+            SFX.I?.PlayGameEnd();
+
+            if (gameOverMenu)
+            {
+                gameOverMenu.Show(winner);
+            }
+            else
+            {
+                // Fallback: pause game if menu not wired yet
+                Time.timeScale = 0f;
+            }
+
+            // Stop any pending serves
+            CancelInvoke(nameof(ServeInternal));
+            return;
+        }
+
         bool leftServingNext = rightDelta > 0;
         pendingServeToRight = leftServingNext;
 
         CancelInvoke(nameof(ServeInternal));
         Invoke(nameof(ServeInternal), serveDelay);
-
-        if (leftScore >= pointsToWin || rightScore >= pointsToWin)
-        {
-            leftScore = 0; rightScore = 0; UpdateUI();
-        }
     }
 
     void ServeInternal() => ball.ResetBall(serveToRight: pendingServeToRight);
