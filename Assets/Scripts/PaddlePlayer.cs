@@ -32,12 +32,6 @@ public class PaddlePlayerInput : MonoBehaviour
             moveAction.action.performed += OnMove;
             moveAction.action.canceled += OnMove;
         }
-
-        if (pauseAction != null && pauseAction.action != null)
-        {
-            pauseAction.action.Enable();
-            pauseAction.action.performed += OnPause;
-        }
     }
 
     void OnDisable()
@@ -48,12 +42,6 @@ public class PaddlePlayerInput : MonoBehaviour
             moveAction.action.canceled -= OnMove;
             moveAction.action.Disable();
         }
-
-        if (pauseAction != null && pauseAction.action != null)
-        {
-            pauseAction.action.performed -= OnPause;
-            pauseAction.action.Disable();
-        }
     }
 
     private void OnMove(InputAction.CallbackContext ctx)
@@ -62,26 +50,20 @@ public class PaddlePlayerInput : MonoBehaviour
         moveInput = ctx.ReadValue<Vector2>();
     }
 
-    private void OnPause(InputAction.CallbackContext ctx)
-    {
-        if (!ctx.performed) return;
-        TogglePause();
-    }
+    // Pause input is handled centrally by PauseManager.
 
     private void TogglePause()
     {
+        // Keep for fallback only; PauseManager now controls timeScale
         isPaused = !isPaused;
-
         if (isPaused)
         {
-            Time.timeScale = 0f; // freeze physics & movement
             moveInput = Vector2.zero;
-            Debug.Log("Game Paused");
+            Debug.Log("Game Paused (local)");
         }
         else
         {
-            Time.timeScale = 1f; // resume
-            Debug.Log("Game Resumed");
+            Debug.Log("Game Resumed (local)");
         }
     }
 
@@ -95,5 +77,15 @@ public class PaddlePlayerInput : MonoBehaviour
         var next = rb.position + desired * Time.fixedDeltaTime;
         next.y = Mathf.Clamp(next.y, -clampY, clampY);
         rb.MovePosition(next);
+    }
+
+    // Allow external controllers (PauseManager) to set pause state
+    public void SetPaused(bool paused)
+    {
+        isPaused = paused;
+        if (paused)
+        {
+            moveInput = Vector2.zero;
+        }
     }
 }

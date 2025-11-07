@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 public class PauseManager : MonoBehaviour
 {
+    public static PauseManager Instance { get; private set; }
     [Header("References")]
     [SerializeField] private GameObject menuCanvas;       // Drag MenuCanvas here
     [SerializeField] private Button resumeButton;         // Drag ResumeButton here
@@ -18,6 +19,9 @@ public class PauseManager : MonoBehaviour
 
     void Awake()
     {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+
         if (menuCanvas)
             menuCanvas.SetActive(false); // Start hidden
 
@@ -99,7 +103,7 @@ public class PauseManager : MonoBehaviour
         TogglePause();
     }
 
-    private void TogglePause()
+    public void TogglePause()
     {
         isPaused = !isPaused;
         Time.timeScale = isPaused ? 0f : 1f;
@@ -126,6 +130,11 @@ public class PauseManager : MonoBehaviour
         }
 
         Debug.Log($"Pause toggled: {(isPaused ? "Paused" : "Resumed")}");
+
+        // Propagate pause state to all player inputs
+        var players = FindObjectsOfType<PaddlePlayerInput>(true);
+        foreach (var p in players)
+            p.SetPaused(isPaused);
     }
 
     // UI Button Hooks

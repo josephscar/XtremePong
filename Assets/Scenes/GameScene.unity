@@ -1107,6 +1107,10 @@ MonoBehaviour:
   menuCanvas: {fileID: 1588778392}
   resumeButton: {fileID: 1317695410}
   pauseAction: {fileID: 4431385022373089764, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  saveButton: {fileID: 1858037876}
+  volumeSlider: {fileID: 2098791356}
+  difficultySlider: {fileID: 1816044883}
+  ai: {fileID: 1146761169}
 --- !u!1 &584663394
 GameObject:
   m_ObjectHideFlags: 0
@@ -1315,7 +1319,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -811.08997, y: 423}
+  m_AnchoredPosition: {x: -488, y: 220}
   m_SizeDelta: {x: 297.82, y: 63.97}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &646388965
@@ -1649,7 +1653,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 811.09, y: 423}
+  m_AnchoredPosition: {x: 488, y: 220}
   m_SizeDelta: {x: 297.82, y: 63.97}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &808089871
@@ -2529,7 +2533,7 @@ MonoBehaviour:
   ball: {fileID: 1138465225}
   moveSpeed: 11
   clampY: 4.2
-  responsiveness: 1.2
+  responsiveness: 0.586
   trackOnlyWhenApproaching: 1
 --- !u!50 &1146761170
 Rigidbody2D:
