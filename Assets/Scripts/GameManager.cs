@@ -56,4 +56,15 @@ public class GameManager : MonoBehaviour
         if (leftScoreText) leftScoreText.text = leftScore.ToString();
         if (rightScoreText) rightScoreText.text = rightScore.ToString();
     }
+
+    // Expose scores for save/load
+    public int LeftScore => leftScore;
+    public int RightScore => rightScore;
+
+    public void SetScores(int left, int right)
+    {
+        leftScore = Mathf.Max(0, left);
+        rightScore = Mathf.Max(0, right);
+        UpdateUI();
+    }
 }

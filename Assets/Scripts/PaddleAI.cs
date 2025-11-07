@@ -53,4 +53,11 @@ public class PaddleAI : MonoBehaviour
         next.y = Mathf.Clamp(next.y, -clampY, clampY);
         rb.MovePosition(next);
     }
+
+    // Difficulty hook: expects 0..1 from UI slider
+    public void SetDifficulty(float t)
+    {
+        // Map slider [0..1] to responsiveness range
+        responsiveness = Mathf.Lerp(0.4f, 1.2f, Mathf.Clamp01(t));
+    }
 }
