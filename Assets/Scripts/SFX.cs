@@ -1,5 +1,11 @@
 using UnityEngine;
 
+/// <summary>
+/// Simple centralized SFX helper.
+/// - Singleton instance persists across scenes
+/// - Plays random clips from configured pools at a master volume
+/// - Exposes pitch jitter for paddle hits
+/// </summary>
 public class SFX : MonoBehaviour
 {
     public static SFX I;
@@ -16,6 +22,7 @@ public class SFX : MonoBehaviour
 
     AudioSource src;
 
+    /// <summary>Singleton bootstrap and AudioSource setup.</summary>
     void Awake()
     {
         if (I) { Destroy(gameObject); return; }
@@ -27,6 +34,9 @@ public class SFX : MonoBehaviour
         src.spatialBlend = 0f;  // 2D sound
     }
 
+    /// <summary>
+    /// Play a hit sound with volume scaled by impact intensity [0..1].
+    /// </summary>
     public void PlayHit(float intensity01 = 1f)
     {
         float vol = Mathf.Clamp01(0.25f + 0.75f * intensity01);
@@ -34,11 +44,15 @@ public class SFX : MonoBehaviour
         PlayRandom(hitClips, vol, pitch);
     }
 
+    /// <summary>Play a scoring sound.</summary>
     public void PlayScore()
     {
         PlayRandom(scoreClips, 1f, 1f + Random.Range(-0.02f, 0.02f));
     }
 
+    /// <summary>
+    /// Helper: play a random clip from a pool with given volume and pitch.
+    /// </summary>
     void PlayRandom(AudioClip[] pool, float volume, float pitch)
     {
         if (pool == null || pool.Length == 0) return;
@@ -47,14 +61,15 @@ public class SFX : MonoBehaviour
         src.PlayOneShot(clip, volume * masterVolume);
     }
 
+    /// <summary>Play a serve/launch sound.</summary>
     public void PlayServe()
     {
         PlayRandom(serveClips, 1f, 1f + Random.Range(-0.03f, 0.03f));
     }
 
+    /// <summary>Play a game end sound.</summary>
     public void PlayGameEnd()
     {
-        // NOTE: You asked not to wire this yet.
         PlayRandom(gameEndClips, 1f, 1f);
     }
 }

@@ -1,19 +1,32 @@
 using UnityEngine;
 
+/// <summary>Identifies which side last hit the ball.</summary>
 public enum Side { None, Left, Right }
 
+/// <summary>
+/// Controls Pong ball physics and interactions.
+/// - Spawns and serves with randomized vertical bias
+/// - Bounces off paddles with basic aim based on contact point
+/// - Increases speed with each paddle hit up to a cap
+/// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class Ball : MonoBehaviour
 {
+    /// <summary>Which side last touched the ball.</summary>
     public Side LastHitter { get; private set; } = Side.None;
+    /// <summary>Initial speed when served.</summary>
     public float startSpeed = 10f;
+    /// <summary>Speed added after each paddle hit.</summary>
     public float speedIncreasePerHit = 0.5f;
+    /// <summary>Maximum allowed speed.</summary>
     public float maxSpeed = 20f;
+    /// <summary>Random Y variation added to paddle bounce to avoid stale rallies.</summary>
     public float randomBounceY = 0.35f;
 
     Rigidbody2D rb;
     Vector2 spawnPos;
 
+    /// <summary>Cache Rigidbody2D and initial spawn position.</summary>
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -25,11 +38,15 @@ public class Ball : MonoBehaviour
         spawnPos = transform.position;
     }
 
+    /// <summary>Auto-serve when enabled (eg. scene load).</summary>
     void OnEnable()
     {
         ResetBall(serveToRight: Random.value > 0.5f);
     }
 
+    /// <summary>
+    /// Reset to spawn and launch in the specified horizontal direction.
+    /// </summary>
     public void ResetBall(bool serveToRight)
     {
         transform.position = spawnPos;
@@ -42,6 +59,9 @@ public class Ball : MonoBehaviour
         SFX.I?.PlayServe();
     }
 
+    /// <summary>
+    /// Handle paddle collisions to produce aimed bounces and SFX.
+    /// </summary>
     void OnCollisionEnter2D(Collision2D col)
     {
         // --- Identify hitter ---
@@ -68,6 +88,9 @@ public class Ball : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns a normalized hit factor [-1..1] based on vertical offset from paddle center.
+    /// </summary>
     float HitFactor(Vector2 ballPos, Vector2 paddlePos, float paddleHeight)
     {
         return Mathf.Clamp((ballPos.y - paddlePos.y) / (paddleHeight * 0.5f), -1f, 1f);

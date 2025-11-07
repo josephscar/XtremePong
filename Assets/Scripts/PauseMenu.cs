@@ -3,6 +3,14 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+/// <summary>
+/// Centralized pause/UI manager.
+/// - Listens for pause input action
+/// - Pauses/unpauses game (timeScale, audio, cursor)
+/// - Shows/hides pause menu and updates sliders/buttons
+/// - Broadcasts pause state to all PaddlePlayerInput components
+/// - Provides Save, Volume and Difficulty hooks
+/// </summary>
 public class PauseManager : MonoBehaviour
 {
     public static PauseManager Instance { get; private set; }
@@ -17,6 +25,7 @@ public class PauseManager : MonoBehaviour
 
     private bool isPaused = false;
 
+    /// <summary>Singleton init, default UI state, and loading of persisted settings.</summary>
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -67,6 +76,7 @@ public class PauseManager : MonoBehaviour
         }
     }
 
+    /// <summary>Register input and UI listeners.</summary>
     void OnEnable()
     {
         if (pauseAction && pauseAction.action != null)
@@ -79,6 +89,7 @@ public class PauseManager : MonoBehaviour
             saveButton.onClick.AddListener(OnClickSave);
     }
 
+    /// <summary>Unregister input and UI listeners.</summary>
     void OnDisable()
     {
         if (pauseAction && pauseAction.action != null)
@@ -97,12 +108,19 @@ public class PauseManager : MonoBehaviour
             difficultySlider.onValueChanged.RemoveListener(OnDifficultyChanged);
     }
 
+    /// <summary>
+    /// Input System callback for the Pause action.
+    /// </summary>
     private void OnPause(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
         TogglePause();
     }
 
+    /// <summary>
+    /// Toggle pause state: manage time, audio, cursor, menu visibility,
+    /// and inform all player inputs to freeze/unfreeze.
+    /// </summary>
     public void TogglePause()
     {
         isPaused = !isPaused;
@@ -138,12 +156,14 @@ public class PauseManager : MonoBehaviour
     }
 
     // UI Button Hooks
+    /// <summary>Resume button event.</summary>
     public void OnClickResume()
     {
         if (!isPaused) return;
         TogglePause();
     }
 
+    /// <summary>Save button event: writes current state to disk.</summary>
     public void OnClickSave()
     {
         var gm = GameManager.Instance;
@@ -157,6 +177,7 @@ public class PauseManager : MonoBehaviour
         SaveSystem.Save(data);
     }
 
+    /// <summary>Volume slider event: sets global volume and persists to PlayerPrefs.</summary>
     public void OnVolumeChanged(float value)
     {
         value = Mathf.Clamp01(value);
@@ -165,6 +186,7 @@ public class PauseManager : MonoBehaviour
         PlayerPrefs.SetFloat("master_volume", value);
     }
 
+    /// <summary>Difficulty slider event: adjusts AI responsiveness and persists to PlayerPrefs.</summary>
     public void OnDifficultyChanged(float value)
     {
         if (!ai) ai = FindObjectOfType<PaddleAI>();
@@ -175,6 +197,7 @@ public class PauseManager : MonoBehaviour
         }
     }
 
+    /// <summary>Quit button event.</summary>
     public void OnClickQuit()
     {
         Debug.Log("Quit button pressed.");
